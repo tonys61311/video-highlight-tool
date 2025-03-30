@@ -1,0 +1,50 @@
+{
+  "fullTranscript": "Welcome to GliaCloud. This is a demo video to showcase highlights...",
+  "sections": [
+    {
+      "title": "Introduction",
+      "startTime": 0,
+      "endTime": 10,
+      "sentences": [
+        {
+          "id": "s1",
+          "start": 0,
+          "end": 3,
+          "text": "Welcome to GliaCloud."
+        },
+        {
+          "id": "s2",
+          "start": 3,
+          "end": 10,
+          "text": "This is a demo video to showcase highlights."
+        }
+      ]
+    },
+    {
+      "title": "Features",
+      "startTime": 10,
+      "endTime": 25,
+      "sentences": [
+        {
+          "id": "s3",
+          "start": 10,
+          "end": 15,
+          "text": "Our tool can generate transcripts and highlights."
+        },
+        {
+          "id": "s4",
+          "start": 15,
+          "end": 20,
+          "text": "Users can select or unselect sentences."
+        },
+        {
+          "id": "s5",
+          "start": 20,
+          "end": 25,
+          "text": "Selected sentences are shown in the highlight preview."
+        }
+      ]
+    }
+  ],
+  "highlightIds": ["s2", "s4"]
+}
