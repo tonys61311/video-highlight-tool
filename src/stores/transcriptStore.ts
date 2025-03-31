@@ -79,11 +79,12 @@ export const useTranscriptStore = defineStore('transcript', {
     async loadTranscript() {
       const res = await fetch('/mock/transcript.json')
       const json: TranscriptData = await res.json()
-
+      console.log('Loaded transcript:', json)
       this.transcript = json
       this.highlights = new Set(json.highlightIds)
       const segment = this.currentHighlightSegment
       if (segment) this.currentTime = segment.start // 設定當前時間為highlight片段的開始時間
+      return json
     },
     toggleSentence(id: string) {
       const copy = new Set(this.highlights)

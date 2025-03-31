@@ -1,7 +1,7 @@
 <template>
   <div class="transcript" ref="scrollContainer">
     <h3>Transcript</h3>
-    <div class="sections">
+    <div class="sections" v-if="store.sections.length > 0">
       <TranscriptSection v-for="section in store.sections" :key="section.title" :section="section" />
     </div>
   </div>

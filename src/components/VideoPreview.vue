@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="container"> <!-- v-if="videoUrl" -->
+    <div class="container" v-if="store.transcript">
       <div class="video-wrapper">
         <video ref="videoRef" class="video-player" :src="videoUrl" @timeupdate="onTimeUpdate"></video>
         <p v-if="currentSentence" class="overlay-text">
@@ -50,6 +50,7 @@ import { ref, computed, nextTick } from 'vue'
 import { useTranscriptStore } from '@/stores/transcriptStore'
 import { Play, Pause, SkipForward, SkipBack } from 'lucide-vue-next'
 import { useVideoControl } from '@/hooks/useVideoControl'
+import { apiRequest } from '@/utils/api'
 
 const store = useTranscriptStore()
 
@@ -135,8 +136,12 @@ function setupVideoDurationListener() {
 // }
 
 // 載入範例影片
-function loadSample() {
+async function loadSample() {
   videoUrl.value = '/videos/sample.mp4';
+  await apiRequest(
+    () => store.loadTranscript(),
+    { minLoadingTime: 1000 }
+  )
   setupVideoDurationListener();
 }
 

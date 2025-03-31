@@ -8,21 +8,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import TranscriptEditor from '@/components/TranscriptEditor.vue'
 import VideoPreview from '@/components/VideoPreview.vue'
-import { useTranscriptStore } from '@/stores/transcriptStore'
 import { provideVideoControl } from '@/hooks/useVideoControl'
 
-const store = useTranscriptStore()
 provideVideoControl()
 
-onMounted(() => {
-  store.loadTranscript()
-})
 </script>
 
 <style scoped lang="scss">
+/* 原有样式保持不变 */
 .editor-view {
   width: 100vw;
   height: 100vh;
