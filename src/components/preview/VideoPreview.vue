@@ -50,7 +50,7 @@ import { ref, computed, nextTick } from 'vue'
 import { useTranscriptStore } from '@/stores/transcriptStore'
 import { Play, Pause, SkipForward, SkipBack } from 'lucide-vue-next'
 import { useVideoControl } from '@/hooks/useVideoControl'
-import { apiRequest } from '@/utils/api'
+import { apiRequest } from '@/utils/apiRequestHandler'
 
 const store = useTranscriptStore()
 const { videoRef } = useVideoControl()
@@ -138,7 +138,7 @@ function setupVideoDurationListener() {
 
 // 載入範例影片
 async function loadSample() {
-  videoUrl.value = '/videos/sample.mp4';
+  videoUrl.value = `${import.meta.env.VITE_API_BASE_URL}/videos/sample.mp4`;
   await apiRequest(
     () => store.loadTranscript(),
     { minLoadingTime: 1000 }

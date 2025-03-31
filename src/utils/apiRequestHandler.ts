@@ -1,7 +1,7 @@
 // utils/api.ts
 import { useApiStore } from '@/stores/apiStore'
 
-type ApiRequestOptions<T> = {
+export type ApiRequestOptions<T> = {
   showLoading?: boolean
   errorMessage?: string
   minLoadingTime?: number // 新增最小加載時間選項
