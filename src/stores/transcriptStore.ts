@@ -8,7 +8,6 @@ export const useTranscriptStore = defineStore('transcript', {
     highlights: new Set<string>(),
     currentTime: 0,
     duration: 1,
-    videoRef: null as HTMLVideoElement | null,
   }),
 
   getters: {
@@ -51,7 +50,7 @@ export const useTranscriptStore = defineStore('transcript', {
       // 單次循環同時檢查
       for (const sentence of sentences) {
         // 檢查是否為當前片段
-        if (state.currentTime >= sentence.start && state.currentTime <= sentence.end) {
+        if (state.currentTime >= sentence.start && state.currentTime < sentence.end) {
           current = sentence;
           break; // 找到當前片段即可停止
         }
@@ -94,23 +93,12 @@ export const useTranscriptStore = defineStore('transcript', {
         copy.add(id)
       }
       this.highlights = copy
-      if (this.videoRef) {
-        this.videoRef.currentTime = this.firstHighlightSegment?.start || 0;
-      }
     },
     setCurrentTime(t: number) {
       this.currentTime = t
     },
-    setVideoRefCurrentTime(t: number) {
-      if (this.videoRef) {
-        this.videoRef.currentTime = t
-      }
-    },
     setDuration(d: number) {
       this.duration = d
-    },
-    setVideoRef(ref: HTMLVideoElement | null) {
-      this.videoRef = ref;
     },
   }
 })

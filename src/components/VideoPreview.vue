@@ -11,9 +11,9 @@
       </div>
     </div>
 
-    <div> <!-- v-if="videoUrl" -->
+    <div class="container"> <!-- v-if="videoUrl" -->
       <div class="video-wrapper">
-        <video ref="localVideoRef" class="video-player" :src="videoUrl" @timeupdate="onTimeUpdate"></video>
+        <video ref="videoRef" class="video-player" :src="videoUrl" @timeupdate="onTimeUpdate"></video>
         <p v-if="currentSentence" class="overlay-text">
           {{ currentSentence.text }}
         </p>
@@ -46,20 +46,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useTranscriptStore } from '@/stores/transcriptStore'
 import { Play, Pause, SkipForward, SkipBack } from 'lucide-vue-next'
+import { useVideoControl } from '@/hooks/useVideoControl'
 
 const store = useTranscriptStore()
 
 const videoUrl = ref<string | undefined>('')
 const isPlaying = ref(false)
-const localVideoRef = ref<HTMLVideoElement | null>(null);
-
-// 绑定
-onMounted(() => store.setVideoRef(localVideoRef.value));
-// 清理
-onUnmounted(() => store.setVideoRef(null));
+const { videoRef } = useVideoControl()
 
 const currentTime = computed({
   get: () => store.currentTime,
@@ -84,40 +80,41 @@ const currentSentence = computed(() => {
 })
 
 function onTimeUpdate() {
-  if (!localVideoRef.value) return;
-  const currentT = localVideoRef.value.currentTime;
+  if (!videoRef.value) return;
+  console.log('Time update:', videoRef.value.currentTime);
+  const currentT = videoRef.value.currentTime;
   currentTime.value = currentT
   const nextSegment = store.currentHighlightSegment;
   if (!nextSegment) {
     // 沒有下一段時停止播放
-    localVideoRef.value.pause();
+    videoRef.value.pause();
     isPlaying.value = false;
-    localVideoRef.value.currentTime = store.firstHighlightSegment?.start || 0;
+    videoRef.value.currentTime = store.firstHighlightSegment?.start || 0;
   } else if (currentT < nextSegment.start) {
     // 自動跳轉到下一段的開始
-    localVideoRef.value.currentTime = nextSegment.start;
+    videoRef.value.currentTime = nextSegment.start;
   }
 }
 
 // 設置影片時長監聽器
 function setupVideoDurationListener() {
   nextTick(() => {
-    if (!localVideoRef.value) return;
+    if (!videoRef.value) return;
 
     const handleLoadedMetadata = () => {
-      const duration = localVideoRef.value?.duration;
+      const duration = videoRef.value?.duration;
       if (duration && duration > 0) {
         store.setDuration(duration);
       }
     };
 
     // 先移除舊的監聽器避免重複綁定
-    localVideoRef.value.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    videoRef.value.removeEventListener('loadedmetadata', handleLoadedMetadata);
     // 添加新的監聽器
-    localVideoRef.value.addEventListener('loadedmetadata', handleLoadedMetadata);
+    videoRef.value.addEventListener('loadedmetadata', handleLoadedMetadata);
 
     // 立即檢查（針對已緩存的影片）
-    if (localVideoRef.value.readyState > 0) {
+    if (videoRef.value.readyState > 0) {
       handleLoadedMetadata();
     }
   });
@@ -144,19 +141,19 @@ function loadSample() {
 }
 
 function togglePlay() {
-  if (!localVideoRef.value) return
-  if (localVideoRef.value.paused) {
-    localVideoRef.value.play()
+  if (!videoRef.value) return
+  if (videoRef.value.paused) {
+    videoRef.value.play()
     isPlaying.value = true
   } else {
-    localVideoRef.value.pause()
+    videoRef.value.pause()
     isPlaying.value = false
   }
 }
 
 function skip(seconds: number) {
-  if (localVideoRef.value) {
-    localVideoRef.value.currentTime += seconds
+  if (videoRef.value) {
+    videoRef.value.currentTime += seconds
   }
 }
 
@@ -170,6 +167,9 @@ function formatTime(seconds: number): string {
 
 <style scoped lang="scss">
 .video-preview {
+  display: flex;
+  flex-direction: column;
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -192,11 +192,18 @@ function formatTime(seconds: number): string {
     }
   }
 
+  .container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
   .video-wrapper {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    flex: 1;
 
     .overlay-text {
       position: absolute;
@@ -209,8 +216,9 @@ function formatTime(seconds: number): string {
 
   .video-player {
     width: 100%;
-    height: auto;
+    height: 100%;
     background: black;
+    object-fit: contain;
   }
 
   .custom-controls {

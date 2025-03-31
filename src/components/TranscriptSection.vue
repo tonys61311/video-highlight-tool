@@ -16,6 +16,7 @@ import { useTranscriptStore } from '@/stores/transcriptStore'
 import type { Section } from '@/types/transcript'
 import { computed, ref, watch, nextTick } from "vue";
 import { useScrollContainer } from '@/hooks/useScrollContainer'
+import { useVideoControl } from '@/hooks/useVideoControl'
 
 defineProps<{
   section: Section
@@ -24,8 +25,10 @@ defineProps<{
 const store = useTranscriptStore()
 const highlights = computed(() => store.highlights)
 const currentHighlightSegment = computed(() => store.currentHighlightSegment)
+const firstHighlightSegment = computed(() => store.firstHighlightSegment)
 const sentenceRefs = ref<Map<string, HTMLLIElement>>(new Map())
 const { scrollToElement } = useScrollContainer()
+const { setCurrentTime } = useVideoControl()
 
 // 修正後的 ref 回調函數
 const setSentenceRef = (el: HTMLLIElement | null, id: string) => {
@@ -43,10 +46,14 @@ function isFocused(id: string) {
 
 function toggle(id: string) {
   store.toggleSentence(id)
+  if (isFocused(id)) setCurrentTime(firstHighlightSegment.value?.start || 0)
+  else setCurrentTime(currentHighlightSegment.value?.start || 0)
 }
 
 function seekTo(id: string, time: number) {
-  if (isSelected(id)) store.setVideoRefCurrentTime(time)
+  if (isSelected(id)) {
+    setCurrentTime(time) // 如果已選中，直接跳轉到該時間
+  }
 }
 
 function formatTime(seconds: number): string {

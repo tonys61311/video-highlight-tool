@@ -12,8 +12,10 @@ import { onMounted } from 'vue'
 import TranscriptEditor from '@/components/TranscriptEditor.vue'
 import VideoPreview from '@/components/VideoPreview.vue'
 import { useTranscriptStore } from '@/stores/transcriptStore'
+import { provideVideoControl } from '@/hooks/useVideoControl'
 
 const store = useTranscriptStore()
+provideVideoControl()
 
 onMounted(() => {
   store.loadTranscript()
