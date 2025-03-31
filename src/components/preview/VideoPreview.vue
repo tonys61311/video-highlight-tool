@@ -141,7 +141,7 @@ async function loadSample() {
   videoUrl.value = '/videos/sample.mp4';
   await apiRequest(
     () => store.loadTranscript(),
-    { minLoadingTime: 1000 }
+    { minLoadingTime: 1100 }
   )
   setupVideoDurationListener();
 }
