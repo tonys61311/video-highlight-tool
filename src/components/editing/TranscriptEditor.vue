@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import TranscriptSection from '@/components/TranscriptSection.vue'
+import TranscriptSection from '@/components/editing/TranscriptSection.vue'
 import { useTranscriptStore } from '@/stores/transcriptStore'
 import { useScrollContainerProvider } from '@/hooks/useScrollContainer'
 

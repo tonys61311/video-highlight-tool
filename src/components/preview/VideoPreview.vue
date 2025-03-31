@@ -20,25 +20,25 @@
       </div>
 
       <div class="custom-controls">
-        <button @click="skip(-5)" aria-label="Backward 5s">
+        <button @click="skipForward(5)" aria-label="Backward 5s">
           <SkipBack :size="20" />
         </button>
         <button @click="togglePlay" aria-label="Play/Pause">
           <Play :size="20" v-if="!isPlaying" />
           <Pause :size="20" v-else />
         </button>
-        <button @click="skip(5)" aria-label="Forward 5s">
+        <button @click="skipBackward(5)" aria-label="Forward 5s">
           <SkipForward :size="20" />
         </button>
         <span class="time">{{ formatCurrentTime }}</span>
       </div>
 
-      <div class="progress-bar">
+      <div class="progress-bar" ref="progressBarRef">
         <div :key="highlight.id" v-for="highlight in store.highlightSegments" class="progress-highlight"
           :class="[...highlight.adjacentClass]" :style="{
             left: `${highlight.leftPercent}%`,
             width: `${highlight.widthPercent}%`,
-          }"></div>
+          }" @click="(e) => handleHighlightClick(e)"></div>
         <div class="progress-current" :style="{ left: store.progressPercent + '%' }"></div>
       </div>
     </div>
@@ -53,10 +53,11 @@ import { useVideoControl } from '@/hooks/useVideoControl'
 import { apiRequest } from '@/utils/api'
 
 const store = useTranscriptStore()
+const { videoRef } = useVideoControl()
 
 const videoUrl = ref<string | undefined>('')
 const isPlaying = ref(false)
-const { videoRef } = useVideoControl()
+const progressBarRef = ref<HTMLDivElement | null>(null)
 
 const currentTime = computed({
   get: () => store.currentTime,
@@ -121,7 +122,7 @@ function setupVideoDurationListener() {
   });
 }
 
-// 處理上傳影片
+// 處理上傳影片 目前暫時只走載入範例影片
 // function handleUpload(event: Event) {
 //   const target = event.target as HTMLInputElement;
 //   const file = target.files?.[0];
@@ -156,7 +157,22 @@ function togglePlay() {
   }
 }
 
-function skip(seconds: number) {
+// 後退跳轉（確保停留在高亮片段）
+function skipForward(seconds: number) {
+  if (!videoRef.value || !store.highlightSegments?.length) return;
+
+  videoRef.value.currentTime -= seconds;
+
+  // 1. 反向排序找出前一個高亮片段
+  const prevHighlight = [...store.highlightSegments]
+    .sort((a, b) => b.start - a.start)
+    .find(seg => seg.start < store.currentTime);
+
+  // 2. 如果有前序高亮則跳轉，否則跳轉到最後一個高亮（循環）
+  videoRef.value.currentTime = prevHighlight?.start || store.firstHighlightSegment?.start || 0;
+}
+
+function skipBackward(seconds: number) {
   if (videoRef.value) {
     videoRef.value.currentTime += seconds
   }
@@ -166,6 +182,23 @@ function formatTime(seconds: number): string {
   const min = Math.floor(seconds / 60)
   const sec = String(Math.floor(seconds % 60)).padStart(2, '0')
   return `${min}:${sec}`
+}
+
+const handleHighlightClick = (e: MouseEvent) => {
+  if (!videoRef.value || !progressBarRef.value) return
+
+  // 1. 计算点击位置在进度条上的百分比 (0~1)
+  const rect = progressBarRef.value.getBoundingClientRect()
+  const clickX = e.clientX - rect.left
+  const clickPercent = Math.min(Math.max(clickX / rect.width, 0), 1)
+
+  // 2. 计算点击位置对应的确切时间（秒）
+  const clickTime = clickPercent * store.duration
+
+  // 3. 跳转到精确时间点
+  videoRef.value.currentTime = clickTime
+
+  e.stopPropagation()
 }
 
 </script>

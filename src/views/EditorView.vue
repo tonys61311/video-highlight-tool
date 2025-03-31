@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import TranscriptEditor from '@/components/TranscriptEditor.vue'
-import VideoPreview from '@/components/VideoPreview.vue'
+import TranscriptEditor from '@/components/editing/TranscriptEditor.vue'
+import VideoPreview from '@/components/preview/VideoPreview.vue'
 import { provideVideoControl } from '@/hooks/useVideoControl'
 
 provideVideoControl()
