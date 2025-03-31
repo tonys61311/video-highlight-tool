@@ -99,8 +99,10 @@ export const useTranscriptStore = defineStore('transcript', {
       }
     },
     setCurrentTime(t: number) {
+      this.currentTime = t
+    },
+    setVideoRefCurrentTime(t: number) {
       if (this.videoRef) {
-        this.currentTime = t
         this.videoRef.currentTime = t
       }
     },

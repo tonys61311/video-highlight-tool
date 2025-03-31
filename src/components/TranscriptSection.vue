@@ -2,7 +2,8 @@
   <div class="section">
     <h4>{{ section.title }}</h4>
     <ul>
-      <li v-for="s in section.sentences" :key="s.id" :class="{ selected: isSelected(s.id) }" @click="toggle(s.id)">
+      <li v-for="s in section.sentences" :key="s.id" :ref="el => setSentenceRef(el as HTMLLIElement, s.id)"
+        :class="{ selected: isSelected(s.id), focused: isFocused(s.id) }" @click="toggle(s.id)">
         <span class="time" @click.stop="seekTo(s.id, s.start)">{{ formatTime(s.start) }}</span>
         <span class="text">{{ s.text }}</span>
       </li>
@@ -13,7 +14,8 @@
 <script setup lang="ts">
 import { useTranscriptStore } from '@/stores/transcriptStore'
 import type { Section } from '@/types/transcript'
-import { computed } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
+import { useScrollContainer } from '@/hooks/useScrollContainer'
 
 defineProps<{
   section: Section
@@ -21,9 +23,22 @@ defineProps<{
 
 const store = useTranscriptStore()
 const highlights = computed(() => store.highlights)
+const currentHighlightSegment = computed(() => store.currentHighlightSegment)
+const sentenceRefs = ref<Map<string, HTMLLIElement>>(new Map())
+const { scrollToElement } = useScrollContainer()
+
+// 修正後的 ref 回調函數
+const setSentenceRef = (el: HTMLLIElement | null, id: string) => {
+  if (el) sentenceRefs.value.set(id, el)
+  else sentenceRefs.value.delete(id) // 刪除已經不存在的元素
+}
 
 function isSelected(id: string) {
   return highlights.value.has(id);
+}
+
+function isFocused(id: string) {
+  return currentHighlightSegment.value?.id === id;
 }
 
 function toggle(id: string) {
@@ -31,7 +46,7 @@ function toggle(id: string) {
 }
 
 function seekTo(id: string, time: number) {
-  if (isSelected(id)) store.setCurrentTime(time)
+  if (isSelected(id)) store.setVideoRefCurrentTime(time)
 }
 
 function formatTime(seconds: number): string {
@@ -39,6 +54,21 @@ function formatTime(seconds: number): string {
   const sec = String(Math.floor(seconds % 60)).padStart(2, '0')
   return `${min}:${sec}`
 }
+
+// Auto-scroll to focused sentence
+watch(currentHighlightSegment, async (newSegment) => {
+  if (!newSegment) return
+
+  await nextTick() // 等待 DOM 更新
+
+  const sentenceEl = sentenceRefs.value.get(newSegment.id)
+  if (sentenceEl) {
+    scrollToElement(sentenceEl, {
+      behavior: 'smooth',
+      block: 'center'
+    })
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -61,6 +91,8 @@ function formatTime(seconds: number): string {
       padding: 0.5rem;
       border-radius: 6px;
       cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
 
       .time {
         font-weight: bold;
@@ -79,6 +111,11 @@ function formatTime(seconds: number): string {
         .text {
           color: white;
         }
+      }
+
+      &.focused {
+        border-color: #f53e0b; // Orange border for focused state
+        box-shadow: 0 0 0 1px #f53e0b;
       }
     }
   }

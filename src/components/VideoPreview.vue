@@ -85,7 +85,6 @@ const currentSentence = computed(() => {
 
 function onTimeUpdate() {
   if (!localVideoRef.value) return;
-
   const currentT = localVideoRef.value.currentTime;
   currentTime.value = currentT
   const nextSegment = store.currentHighlightSegment;
