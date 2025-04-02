@@ -5,10 +5,10 @@ import { transcriptApi } from '@/api/transcriptApi'
 
 export const useTranscriptStore = defineStore('transcript', {
   state: () => ({
-    transcript: null as TranscriptData | null,
-    highlights: new Set<string>(),
-    currentTime: 0,
-    duration: 1,
+    transcript: null as TranscriptData | null, // Api 回傳的 transcript 資料，包含 sections 和 highlightIds
+    highlights: new Set<string>(), // 儲存目前選取的 highlight 片段 ID 集合
+    currentTime: 0, // 當前播放時間，單位為秒
+    duration: 1, // 視頻總長度，單位為秒
   }),
 
   getters: {
@@ -18,6 +18,7 @@ export const useTranscriptStore = defineStore('transcript', {
     selectedIds(state): string[] {
       return Array.from(state.highlights)
     },
+    // 取得highlight片段的詳細資訊，包含百分比和相鄰片段資訊
     highlightSegments(state): HighlightSentence[] {
       if (!state.transcript?.sections || !state.duration) return [];
 
@@ -35,14 +36,14 @@ export const useTranscriptStore = defineStore('transcript', {
 
           return {
             ...sentence,
-            leftPercent: (sentence.start / state.duration) * 100,
-            widthPercent: ((sentence.end - sentence.start) / state.duration) * 100,
-            adjacentClass: classParts
+            leftPercent: (sentence.start / state.duration) * 100, // 計算左側百分比
+            widthPercent: ((sentence.end - sentence.start) / state.duration) * 100, // 計算寬度百分比
+            adjacentClass: classParts //樣式標籤（連續 highlight 的視覺優化）
           };
         })
         .filter(sentence => state.highlights.has(sentence.id));
     },
-    // 找出當前時間所屬的高亮片段
+    // 找出當前時間所屬的highlight片段
     currentHighlightSegment(state): HighlightSentence | null {
       const sentences = this.highlightSegments;
       let current: HighlightSentence | null = null;
@@ -63,6 +64,7 @@ export const useTranscriptStore = defineStore('transcript', {
 
       return current || next || null;
     },
+    // 找出第一個highlight片段，用於初始化或預設播放
     firstHighlightSegment(state): HighlightSentence | null {
       const sentences = this.highlightSegments;
       if (sentences.length > 0) {
@@ -70,6 +72,7 @@ export const useTranscriptStore = defineStore('transcript', {
       }
       return null;
     },
+    // 計算當前播放進度的百分比
     progressPercent(state): number {
       if (!state.duration) return 0;
       return (state.currentTime / state.duration) * 100;
@@ -77,6 +80,7 @@ export const useTranscriptStore = defineStore('transcript', {
   },
 
   actions: {
+    // 初始化載入 transcript 資料
     async loadTranscript() {
       const json = await transcriptApi.loadTranscript()
       if (json) {
@@ -88,6 +92,7 @@ export const useTranscriptStore = defineStore('transcript', {
       }
       return json
     },
+    // 更新 highlights 片段
     toggleSentence(id: string) {
       const copy = new Set(this.highlights)
       if (copy.has(id)) {

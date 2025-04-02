@@ -51,6 +51,7 @@ import { useTranscriptStore } from '@/stores/transcriptStore'
 import { Play, Pause, SkipForward, SkipBack } from 'lucide-vue-next'
 import { useVideoControl } from '@/hooks/useVideoControl'
 import { apiRequest } from '@/utils/apiRequestHandler'
+import { formatTime } from '@/utils/helpers'
 
 const store = useTranscriptStore()
 const { videoRef } = useVideoControl()
@@ -81,6 +82,7 @@ const currentSentence = computed(() => {
   return null
 })
 
+// 監聽 videoRef currentTime的變化
 function onTimeUpdate() {
   if (!videoRef.value) return;
   const currentT = videoRef.value.currentTime;
@@ -177,24 +179,19 @@ function skipBackward(seconds: number) {
   }
 }
 
-function formatTime(seconds: number): string {
-  const min = Math.floor(seconds / 60)
-  const sec = String(Math.floor(seconds % 60)).padStart(2, '0')
-  return `${min}:${sec}`
-}
-
+// 點擊進度條後跳轉到相應的時間點
 const handleHighlightClick = (e: MouseEvent) => {
   if (!videoRef.value || !progressBarRef.value) return
 
-  // 1. 计算点击位置在进度条上的百分比 (0~1)
+  // 1. 計算點擊位置在進度條上的百分比 (0~1)
   const rect = progressBarRef.value.getBoundingClientRect()
   const clickX = e.clientX - rect.left
   const clickPercent = Math.min(Math.max(clickX / rect.width, 0), 1)
 
-  // 2. 计算点击位置对应的确切时间（秒）
+  // 2. 計算點擊位置對應的確切時間（秒）
   const clickTime = clickPercent * store.duration
 
-  // 3. 跳转到精确时间点
+  // 3. 跳轉到確切的時間點
   videoRef.value.currentTime = clickTime
 
   e.stopPropagation()

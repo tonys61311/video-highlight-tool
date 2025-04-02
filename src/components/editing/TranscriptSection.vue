@@ -17,6 +17,7 @@ import type { Section } from '@/types/transcript'
 import { computed, ref, watch, nextTick } from "vue";
 import { useScrollContainer } from '@/hooks/useScrollContainer'
 import { useVideoControl } from '@/hooks/useVideoControl'
+import { formatTime } from '@/utils/helpers'
 
 defineProps<{
   section: Section
@@ -26,7 +27,7 @@ const store = useTranscriptStore()
 const highlights = computed(() => store.highlights)
 const currentHighlightSegment = computed(() => store.currentHighlightSegment)
 const firstHighlightSegment = computed(() => store.firstHighlightSegment)
-const sentenceRefs = ref<Map<string, HTMLLIElement>>(new Map())
+const sentenceRefs = ref<Map<string, HTMLLIElement>>(new Map()) // 儲存句子的 DOM 元素，用於滾動到特定句子
 const { scrollToElement } = useScrollContainer()
 const { setCurrentTime } = useVideoControl()
 
@@ -36,10 +37,12 @@ const setSentenceRef = (el: HTMLLIElement | null, id: string) => {
   else sentenceRefs.value.delete(id) // 刪除已經不存在的元素
 }
 
+// 當前句子是否已選中
 function isSelected(id: string) {
   return highlights.value.has(id);
 }
 
+// 判斷當前句子是否為focused
 function isFocused(id: string) {
   return currentHighlightSegment.value?.id === id;
 }
@@ -56,13 +59,7 @@ function seekTo(id: string, time: number) {
   }
 }
 
-function formatTime(seconds: number): string {
-  const min = Math.floor(seconds / 60)
-  const sec = String(Math.floor(seconds % 60)).padStart(2, '0')
-  return `${min}:${sec}`
-}
-
-// Auto-scroll to focused sentence
+// 監聽 currentHighlightSegment 的變化，滾動到相應的句子
 watch(currentHighlightSegment, async (newSegment) => {
   if (!newSegment) return
 
