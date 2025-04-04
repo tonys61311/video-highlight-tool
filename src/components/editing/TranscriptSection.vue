@@ -26,10 +26,9 @@ defineProps<{
 const store = useTranscriptStore()
 const highlights = computed(() => store.highlights)
 const currentHighlightSegment = computed(() => store.currentHighlightSegment)
-const firstHighlightSegment = computed(() => store.firstHighlightSegment)
 const sentenceRefs = ref<Map<string, HTMLLIElement>>(new Map()) // 儲存句子的 DOM 元素，用於滾動到特定句子
 const { scrollToElement } = useScrollContainer()
-const { setCurrentTime } = useVideoControl()
+const { setVideoRefCurrentTime, pauseVideo, onTimeUpdate } = useVideoControl()
 
 // 修正後的 ref 回調函數
 const setSentenceRef = (el: HTMLLIElement | null, id: string) => {
@@ -48,14 +47,14 @@ function isFocused(id: string) {
 }
 
 function toggle(id: string) {
+  pauseVideo() // 暫停視頻播放，避免在選擇句子時視頻繼續播放
   store.toggleSentence(id)
-  if (isFocused(id)) setCurrentTime(firstHighlightSegment.value?.start || 0)
-  else setCurrentTime(currentHighlightSegment.value?.start || 0)
+  onTimeUpdate()
 }
 
 function seekTo(id: string, time: number) {
   if (isSelected(id)) {
-    setCurrentTime(time) // 如果已選中，直接跳轉到該時間
+    setVideoRefCurrentTime(time) // 如果已選中，直接跳轉到該時間
   }
 }
 

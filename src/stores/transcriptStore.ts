@@ -1,6 +1,6 @@
 // stores/transcriptStore.ts
 import { defineStore } from 'pinia'
-import type { TranscriptData, Section, HighlightSentence } from '@/types/transcript'
+import type { TranscriptData, Section, HighlightSentence, Sentence } from '@/types/transcript'
 import { transcriptApi } from '@/api/transcriptApi'
 
 export const useTranscriptStore = defineStore('transcript', {
@@ -64,6 +64,20 @@ export const useTranscriptStore = defineStore('transcript', {
 
       return current || next || null;
     },
+    currentSentence (): Sentence | null {
+      if (this.sections.length === 0) return null
+      for (const section of this.sections) {
+        for (const sentence of section.sentences) {
+          if (
+            this.currentTime >= sentence.start &&
+            this.currentTime < sentence.end
+          ) {
+            return sentence
+          }
+        }
+      }
+      return null
+    },
     // 找出第一個highlight片段，用於初始化或預設播放
     firstHighlightSegment(state): HighlightSentence | null {
       const sentences = this.highlightSegments;
@@ -88,7 +102,7 @@ export const useTranscriptStore = defineStore('transcript', {
         this.transcript = json
         this.highlights = new Set(json.highlightIds)
         const segment = this.currentHighlightSegment
-        if (segment) this.currentTime = segment.start
+        if (segment) this.setCurrentTime(segment.start)
       }
       return json
     },
