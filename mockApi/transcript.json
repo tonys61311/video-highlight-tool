@@ -1,0 +1,106 @@
+{
+  "fullTranscript": "Welcome to our product demo. Today we'll show you how to use our AI-powered video analysis tools. First, let's look at the automatic transcription feature. As you can see, it accurately converts speech to text in real-time. Next, we'll demonstrate the highlight selection capability. You can simply click sentences to create highlights. These highlights can be exported for content repurposing. Finally, we'll show the summary generation feature. Our AI analyzes key moments and creates concise summaries. Let's try selecting a few important points now. The system will automatically compile them into a highlight reel. This is perfect for creating social media clips or meeting minutes.",
+  "sections": [
+    {
+      "title": "Introduction",
+      "startTime": 0,
+      "endTime": 15,
+      "sentences": [
+        {
+          "id": "intro1",
+          "start": 0,
+          "end": 3,
+          "text": "Welcome to our product demo."
+        },
+        {
+          "id": "intro2",
+          "start": 3,
+          "end": 8,
+          "text": "Today we'll show you how to use our AI-powered video analysis tools."
+        },
+        {
+          "id": "intro3",
+          "start": 8,
+          "end": 15,
+          "text": "First, let's look at the automatic transcription feature."
+        }
+      ]
+    },
+    {
+      "title": "Transcription Demo",
+      "startTime": 15,
+      "endTime": 30,
+      "sentences": [
+        {
+          "id": "demo1",
+          "start": 15,
+          "end": 20,
+          "text": "As you can see, it accurately converts speech to text in real-time."
+        },
+        {
+          "id": "demo2",
+          "start": 20,
+          "end": 25,
+          "text": "Next, we'll demonstrate the highlight selection capability."
+        },
+        {
+          "id": "demo3",
+          "start": 25,
+          "end": 30,
+          "text": "You can simply click sentences to create highlights."
+        }
+      ]
+    },
+    {
+      "title": "Highlight Features",
+      "startTime": 30,
+      "endTime": 45,
+      "sentences": [
+        {
+          "id": "feat1",
+          "start": 30,
+          "end": 35,
+          "text": "These highlights can be exported for content repurposing."
+        },
+        {
+          "id": "feat2",
+          "start": 35,
+          "end": 40,
+          "text": "Finally, we'll show the summary generation feature."
+        },
+        {
+          "id": "feat3",
+          "start": 40,
+          "end": 45,
+          "text": "Our AI analyzes key moments and creates concise summaries."
+        }
+      ]
+    },
+    {
+      "title": "Live Demonstration",
+      "startTime": 45,
+      "endTime": 60,
+      "sentences": [
+        {
+          "id": "live1",
+          "start": 45,
+          "end": 50,
+          "text": "Let's try selecting a few important points now."
+        },
+        {
+          "id": "live2",
+          "start": 50,
+          "end": 55,
+          "text": "The system will automatically compile them into a highlight reel."
+        },
+        {
+          "id": "live3",
+          "start": 55,
+          "end": 60,
+          "text": "This is perfect for creating social media clips or meeting minutes."
+        }
+      ]
+    }
+  ],
+  "highlightIds": ["intro2", "demo2", "feat1", "live2"]
+}
