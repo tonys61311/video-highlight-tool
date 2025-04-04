@@ -121,7 +121,6 @@ async function loadSample() {
 
       .video-player {
         width: 100%;
-        height: 100%;
         height: auto;
         background: black;
         object-fit: contain;

@@ -40,6 +40,7 @@ provideVideoControl()
       padding: 1rem;
       background: #1e1e2f;
       color: white;
+      overflow-y: auto;
     }
   }
 }
