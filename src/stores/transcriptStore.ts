@@ -64,20 +64,6 @@ export const useTranscriptStore = defineStore('transcript', {
 
       return current || next || null;
     },
-    currentSentence (): Sentence | null {
-      if (this.sections.length === 0) return null
-      for (const section of this.sections) {
-        for (const sentence of section.sentences) {
-          if (
-            this.currentTime >= sentence.start &&
-            this.currentTime < sentence.end
-          ) {
-            return sentence
-          }
-        }
-      }
-      return null
-    },
     // 找出第一個highlight片段，用於初始化或預設播放
     firstHighlightSegment(state): HighlightSentence | null {
       const sentences = this.highlightSegments;

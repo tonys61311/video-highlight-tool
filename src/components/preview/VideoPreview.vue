@@ -14,8 +14,8 @@
     <div class="container" v-if="store.transcript">
       <div class="video-wrapper">
         <video ref="videoRef" class="video-player" :src="videoUrl" @timeupdate="onTimeUpdate"></video>
-        <p v-if="currentSentence" class="overlay-text">
-          {{ currentSentence.text }}
+        <p v-if="currentSegment" class="overlay-text">
+          {{ currentSegment.text }}
         </p>
       </div>
 
@@ -57,7 +57,7 @@ const { videoRef, progressBarRef, isPlaying, formatCurrentTime, setVideoRefCurre
 
 // 保留需要在组件中处理的部分
 const videoUrl = ref('')
-const currentSentence = computed(() => store.currentSentence)
+const currentSegment = computed(() => store.currentHighlightSegment)
 
 async function loadSample() {
   videoUrl.value = `${import.meta.env.VITE_API_BASE_URL}/videos/sample.mp4`
